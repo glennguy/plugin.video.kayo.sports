@@ -2,4 +2,4 @@
 
 Unofficial 3rd Party Kayo Sports plugin for Kodi.
 
-https://www.matthuisman.nz/2019/02/kayo-sports-kodi-add-on.html
+https://www.matthuisman.nz/2019/03/kayo-sports-kodi-add-on.html
