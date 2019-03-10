@@ -116,6 +116,29 @@ def alert(asset, title, image):
     userdata.set('alerts', alerts)
     gui.refresh()
 
+@plugin.route()  
+def playlist(output=''):
+    playlist = '#EXTM3U x-tvg-url=""\n\n'
+
+    count = 1
+    data = api.panel('yJbvNNbmxlD6')
+    for row in data.get('contents', []):
+        asset = row['data']['asset']
+
+        if row['contentType'] != 'video':
+            continue
+
+        playlist += '#EXTINF:-1 tvg-name="{count:03d}" tvg-id="{id}" tvg-logo="{logo}",{name}\n{path}\n\n'.format(
+            count=count, id=asset['id'], logo=_get_image(asset, 'carousel-item'), name=asset['title'], path=plugin.url_for(play, id=asset['id']))
+        count += 1
+
+    playlist = playlist.strip()
+
+    output = output or 'playlist.m3u8'
+    with open(output, 'w') as f:
+        f.write(playlist)
+
+
 @plugin.route()
 @plugin.login_required()
 def play(id, start_from=0):
