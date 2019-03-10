@@ -24,5 +24,6 @@ class Language(BaseLanguage):
     WATCH            = 30021
     CLOSE            = 30022
     EVENT_STARTED    = 30023
+    LIVE_PLAY_TYPE   = 30024
 
 _ = Language()

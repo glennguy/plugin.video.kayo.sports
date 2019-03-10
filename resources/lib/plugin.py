@@ -5,7 +5,7 @@ from matthuisman.exceptions import PluginError
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE
 
 api = API()
 
@@ -297,8 +297,11 @@ def _parse_video(asset):
             plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from)
         )))
 
-    #maybe have a default play from live or from start
-    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=0 if is_live else start_from)
+    index = settings.getInt('live_play_type', 0)
+    if is_live and LIVE_PLAY_TYPE[index] == FROM_LIVE:
+        start_from = 0
+
+    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from)
 
     return item
 

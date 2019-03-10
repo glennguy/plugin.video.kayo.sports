@@ -112,6 +112,10 @@ msgctxt "#30023"
 msgid "{event} has started!"
 msgstr ""
 
+msgctxt "#30024"
+msgid "Default Live Play Action"
+msgstr ""
+
 ##COMMON##
 
 msgctxt "#32000"
