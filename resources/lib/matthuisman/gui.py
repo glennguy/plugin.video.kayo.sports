@@ -58,7 +58,10 @@ def progress(message, heading=None, percent=0):
     finally:
         dialog.close()
 
-def input(message, default='', **kwargs):
+def input(message, default='', hide_input=False, **kwargs):
+    if hide_input:
+        kwargs['option'] = xbmcgui.ALPHANUM_HIDE_INPUT
+        
     return xbmcgui.Dialog().input(message, default, **kwargs)
 
 def ok(message, heading=None):
