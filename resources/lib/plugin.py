@@ -26,7 +26,7 @@ def home():
 
         folder.add_items(_landing('home'))
 
-        folder.add_item(label=_.SELECT_PROFILE, path=plugin.url_for(select_profile))
+        #folder.add_item(label=_.SELECT_PROFILE, path=plugin.url_for(select_profile))
         folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout))
 
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS))
@@ -47,14 +47,14 @@ def login():
 
     api.login(username=username, password=password)
 
-    _select_profile()
+    #_select_profile()
 
     gui.refresh()
 
-@plugin.route()
-def select_profile():
-    _select_profile()
-    gui.refresh()
+# @plugin.route()
+# def select_profile():
+#     _select_profile()
+#     gui.refresh()
 
 @plugin.route()
 def logout():
@@ -202,16 +202,15 @@ def _get_stream(asset):
 
     return streams[0]
 
-def _select_profile():
-    profiles = api.profiles()
-    profiles.append({'id': None, 'name': _.NO_PROFILE})
+# def _select_profile():
+#     profiles = api.profiles()
+#     profiles.append({'id': None, 'name': _.NO_PROFILE})
 
-    index = gui.select(_.SELECT_PROFILE, options=[p['name'] for p in profiles])
-    if index < 0:
-        return
+#     index = gui.select(_.SELECT_PROFILE, options=[p['name'] for p in profiles])
+#     if index < 0:
+#         return
 
-    userdata.set('profile', profiles[index]['id'])
-
+#     userdata.set('profile', profiles[index]['id'])
 
 def _sport(sport):
     items = []
