@@ -132,7 +132,11 @@ class Item(object):
         return string.strip('&')
 
     def get_li(self):
-        li = xbmcgui.ListItem()
+        try:
+            #KODI 18+
+            li = xbmcgui.ListItem(offscreen=True)
+        except:
+            li = xbmcgui.ListItem()
 
         if self.label:
             li.setLabel(self.label)

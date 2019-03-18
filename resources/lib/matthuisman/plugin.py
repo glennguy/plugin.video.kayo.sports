@@ -4,7 +4,7 @@ from functools import wraps
 
 import xbmc, xbmcplugin
 
-from . import router, gui, settings, database, cache, userdata, inputstream, signals
+from . import router, gui, settings, userdata, inputstream, signals
 from .constants import ROUTE_SETTINGS, ROUTE_RESET, ROUTE_SERVICE, ROUTE_CLEAR_CACHE, ROUTE_IA_SETTINGS, ROUTE_IA_INSTALL, ADDON_ICON, ADDON_FANART, ADDON_ID
 from .log import log
 from .language import _
@@ -54,11 +54,6 @@ def resolve():
     if _handle() > 0:
         xbmcplugin.endOfDirectory(_handle(), succeeded=False, updateListing=False, cacheToDisc=False)
     
-@signals.on(signals.BEFORE_DISPATCH)
-def _open():
-    database.connect()
-    cache.remove_expired()
-
 @signals.on(signals.ON_ERROR)
 def _error(e):
     try:
@@ -82,10 +77,6 @@ def _exception(e):
     gui.exception()
     resolve()
 
-@signals.on(signals.AFTER_DISPATCH)
-def _close():
-    database.close()
-
 @route('')
 def _home():
     raise PluginError(_.PLUGIN_NO_DEFAULT_ROUTE)
@@ -104,6 +95,10 @@ def reboot():
     _close()
     xbmc.executebuiltin('Reboot')
 
+@signals.on(signals.AFTER_DISPATCH)
+def _close():
+    signals.emit(signals.ON_CLOSE)
+
 @route(ROUTE_SETTINGS)
 def _settings():
     _close()
@@ -116,15 +111,8 @@ def _reset():
         return
 
     userdata.clear()
-    database.delete()
     gui.notification(_.PLUGIN_RESET_OK)
     signals.emit(signals.AFTER_RESET)
-
-@route(ROUTE_CLEAR_CACHE)
-def _clear_cache(key):
-    delete_count = cache.delete(key)
-    msg = _(_.PLUGIN_CACHE_REMOVED, delete_count=delete_count)
-    gui.notification(msg)
 
 @route(ROUTE_SERVICE)
 def _service():
@@ -147,7 +135,7 @@ class Item(gui.Item):
         self.cache_key = cache_key
 
     def get_li(self):
-        if cache.enabled() and self.cache_key:
+        if settings.getBool('use_cache', True) and self.cache_key:
             url = url_for(ROUTE_CLEAR_CACHE, key=self.cache_key)
             self.context.append((_.PLUGIN_CONTEXT_CLEAR_CACHE, 'XBMC.RunPlugin({})'.format(url)))
 
