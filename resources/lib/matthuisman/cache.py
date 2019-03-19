@@ -1,7 +1,7 @@
 from time import time
 from functools import wraps
 
-from . import peewee, database, settings, signals, gui, plugin
+from . import peewee, database, settings, signals, gui, router
 from .constants import CACHE_TABLENAME, CACHE_EXPIRY, CACHE_CHECKSUM, CACHE_CLEAN_INTERVAL, CACHE_CLEAN_KEY, ROUTE_CLEAR_CACHE
 from .util import hash_6
 from .log import log
@@ -96,7 +96,7 @@ def remove_expired():
     deleted = Cache.delete_where(Cache.expires < int(time()))
     log('Cache: Deleted {} Expired Rows'.format(deleted))
 
-@plugin.route('_clear_cache')
+@router.route(ROUTE_CLEAR_CACHE)
 def clear_cache(key):
     delete_count = delete(key)
     msg = _(_.PLUGIN_CACHE_REMOVED, delete_count=delete_count)

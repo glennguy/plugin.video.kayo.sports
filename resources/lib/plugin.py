@@ -239,16 +239,15 @@ def _landing(name):
     return items
 
 def _parse_panel(row):
-    art = {}
-
-    items = _parse_contents(row.get('contents', []))
-    if items:
-        art = items[0].art
+    #art = {}
+    # items = _parse_contents(row.get('contents', []))
+    # if items:
+    #     art = items[0].art
 
     return plugin.Item(
         label = row['title'],
         path  = plugin.url_for(panel, id=row['id']),
-        art   = art,
+    #    art   = art,
     )
 
 def _parse_contents(rows):
