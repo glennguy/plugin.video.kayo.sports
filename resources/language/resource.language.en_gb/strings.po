@@ -70,9 +70,8 @@ msgctxt "#30013"
 msgid "Select Profile"
 msgstr ""
 
-msgctxt "#30014"
-msgid "Use Inputstream HLS (REQUIRED)"
-msgstr ""
+
+
 
 msgctxt "#30015"
 msgid "Set Reminder"
@@ -114,6 +113,23 @@ msgstr ""
 
 msgctxt "#30024"
 msgid "Default Live Play Action"
+msgstr ""
+
+msgctxt "#30025"
+msgid "General"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Playback"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Utility"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Inputstream HLS required to watch Streams From Live\n"
+"Check HLS is enabled in settings and Inputstream Adaptive is installed"
 msgstr ""
 
 ##COMMON##

@@ -14,7 +14,7 @@ class Language(BaseLanguage):
     LIVE             = 30011
     FROM_START       = 30012
     SELECT_PROFILE   = 30013
-    HLS_SETTINGS     = 30014
+
     SET_REMINDER     = 30015
     REMOVE_REMINDER  = 30016
     REMINDER_SET     = 30017
@@ -25,5 +25,9 @@ class Language(BaseLanguage):
     CLOSE            = 30022
     EVENT_STARTED    = 30023
     LIVE_PLAY_TYPE   = 30024
+    GENERAL          = 30025
+    PLAYBACK         = 30026
+    UTILITY          = 30027
+    HLS_REQUIRED     = 30028
 
 _ = Language()

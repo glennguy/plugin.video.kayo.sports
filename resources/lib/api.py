@@ -63,15 +63,10 @@ class API(object):
 
         self._oauth_token(payload)
 
-    def profiles(self):
-        self._refresh_token()
-        return self._session.get('https://profileapi.kayosports.com.au/user/profile').json()
-
     #landing has heros and panels
     def landing(self, name):
         params = {
             'evaluate': 3, 
-            #'profile': userdata.get('profile'),
             'resourcesEnv': 'production',
             'chromecastEnv': 'production',
             'statsEnv': 'production',
@@ -83,7 +78,6 @@ class API(object):
     def panel(self, id):
         params = {
             'evaluate': 3, 
-          #  'profile': userdata.get('profile'),
         }
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/carousel/keys/{}'.format(id), params=params).json()[0]
@@ -92,7 +86,6 @@ class API(object):
     def show(self, id):
         params = {
             'evaluate': 3, 
-           # 'profile': userdata.get('profile'),
             'showCategory': id,
         }
 
@@ -101,7 +94,6 @@ class API(object):
     def event(self, id):
         params = {
             'evaluate': 3, 
-           # 'profile': userdata.get('profile'),
             'event': id,
         }
 
@@ -110,7 +102,6 @@ class API(object):
     def sport(self, sport=None):
         params = {
             'evaluate': 3, 
-         #   'profile': userdata.get('profile'),
             'sport': sport, 
         }
 

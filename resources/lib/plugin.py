@@ -5,7 +5,7 @@ from matthuisman.exceptions import PluginError
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE, IMG_URL
 
 api = API()
 
@@ -26,7 +26,6 @@ def home():
 
         folder.add_items(_landing('home'))
 
-        #folder.add_item(label=_.SELECT_PROFILE, path=plugin.url_for(select_profile))
         folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout))
 
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS))
@@ -46,15 +45,7 @@ def login():
         return
 
     api.login(username=username, password=password)
-
-    #_select_profile()
-
     gui.refresh()
-
-# @plugin.route()
-# def select_profile():
-#     _select_profile()
-#     gui.refresh()
 
 @plugin.route()
 def logout():
@@ -143,11 +134,11 @@ def playlist(output=''):
 @plugin.login_required()
 def play(id, start_from=0):
     asset = api.stream(id)
+    start_from = int(start_from)
 
     start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
-
     if start > arrow.now():
-        return gui.ok(_(_.GAME_NOT_STARTED, start=start.humanize()))
+        raise PluginError(_(_.GAME_NOT_STARTED, start=start.humanize()))
 
     stream = _get_stream(asset)
 
@@ -157,10 +148,16 @@ def play(id, start_from=0):
         headers = HEADERS,
     )
 
+    hls = inputstream.HLS()
+
     if stream['mediaFormat'] == 'dash':
         item.inputstream = inputstream.MPD()
     elif stream['mediaFormat'] == 'hls-ts':
-        item.inputstream = inputstream.HLS()
+        #If live stream FROM_LIVE and no HLS
+        if asset['isLive'] and not start_from and not hls.check():
+            raise PluginError(_.HLS_REQUIRED)
+        else:
+            item.inputstream = hls
 
     if start_from:
         item.properties['ResumeTime'] = start_from
@@ -202,16 +199,6 @@ def _get_stream(asset):
 
     return streams[0]
 
-# def _select_profile():
-#     profiles = api.profiles()
-#     profiles.append({'id': None, 'name': _.NO_PROFILE})
-
-#     index = gui.select(_.SELECT_PROFILE, options=[p['name'] for p in profiles])
-#     if index < 0:
-#         return
-
-#     userdata.set('profile', profiles[index]['id'])
-
 def _sport(sport):
     items = []
 
@@ -239,15 +226,9 @@ def _landing(name):
     return items
 
 def _parse_panel(row):
-    #art = {}
-    # items = _parse_contents(row.get('contents', []))
-    # if items:
-    #     art = items[0].art
-
     return plugin.Item(
         label = row['title'],
         path  = plugin.url_for(panel, id=row['id']),
-    #    art   = art,
     )
 
 def _parse_contents(rows):
@@ -344,4 +325,4 @@ def _get_image(asset, type='carousel-item', width=2048):
     if 'image-pack' not in asset:
         return None
 
-    return 'https://vmndims.kayosports.com.au/api/v2/img/{}?location={}&imwidth={}'.format(asset['image-pack'], type, width)
+    return IMG_URL.format(asset['image-pack'], type, width)
