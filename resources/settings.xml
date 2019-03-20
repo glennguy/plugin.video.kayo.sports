@@ -4,7 +4,7 @@
     <setting label="30024" id="live_play_type" type="enum" default="0" lvalues="30020|30012"/>
     
     <setting label="30026" type="lsep"/>
-    <setting label="32023" type="bool" id="use_ia_hls" default="true" enable="true"/>
+    <setting label="32023" type="bool" id="use_ia_hls" default="true"/>
     <setting label="32018" type="action" action="RunPlugin(plugin://$ID/?_=_ia_settings)" option="close" />
     <setting label="32021" type="action" action="RunPlugin(plugin://$ID/?_=_ia_install)" visible="false"/>
 
