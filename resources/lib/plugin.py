@@ -218,10 +218,11 @@ def _landing(name):
     items = []
 
     for row in api.landing(name):
-        if row['panelType'] == 'hero-carousel' and 'contents' in row:
-            items.extend(_parse_contents(row['contents']))
-        else:
+        if row['panelType'] != 'hero-carousel':
             items.append(_parse_panel(row))
+
+        elif row['panelType'] == 'hero-carousel' and 'contents' in row and settings.getBool('show_hero_contents'):
+            items.extend(_parse_contents(row['contents']))
 
     return items
 

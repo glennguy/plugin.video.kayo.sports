@@ -2,6 +2,7 @@
 <settings>
     <setting label="30025" type="lsep"/>
     <setting label="30024" id="live_play_type" type="enum" default="0" lvalues="30020|30012"/>
+    <setting label="30014" id="show_hero_contents" type="bool" default="true"/>
     
     <setting label="30026" type="lsep"/>
     <setting label="32023" type="bool" id="use_ia_hls" default="true"/>

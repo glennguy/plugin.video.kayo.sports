@@ -70,8 +70,9 @@ msgctxt "#30013"
 msgid "Select Profile"
 msgstr ""
 
-
-
+msgctxt "#30014"
+msgid "Show Hero Contents"
+msgstr ""
 
 msgctxt "#30015"
 msgid "Set Reminder"
