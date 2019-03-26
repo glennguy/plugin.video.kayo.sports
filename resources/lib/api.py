@@ -1,6 +1,6 @@
 from time import time
 
-from matthuisman import userdata, settings
+from matthuisman import userdata
 from matthuisman.session import Session
 from matthuisman.exceptions import Error
 
