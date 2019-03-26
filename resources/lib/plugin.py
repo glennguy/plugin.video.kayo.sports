@@ -41,12 +41,11 @@ def login():
 
     userdata.set('username', username)
 
-    password = gui.input(_.ASK_PASSWORD).strip()
+    password = gui.input(_.ASK_PASSWORD, hide_input=True).strip()
     if not password:
         return
 
     api.login(username=username, password=password)
-
     gui.refresh()
 
 @plugin.route()
