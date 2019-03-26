@@ -1,6 +1,6 @@
 from time import time
 
-from matthuisman import userdata
+from matthuisman import userdata, settings
 from matthuisman.session import Session
 from matthuisman.exceptions import Error
 
@@ -63,10 +63,15 @@ class API(object):
 
         self._oauth_token(payload)
 
+    def profiles(self):
+        self._refresh_token()
+        return self._session.get('https://profileapi.kayosports.com.au/user/profile').json()
+
     #landing has heros and panels
     def landing(self, name):
         params = {
             'evaluate': 3, 
+            'profile': userdata.get('profile'),
             'resourcesEnv': 'production',
             'chromecastEnv': 'production',
             'statsEnv': 'production',
@@ -78,6 +83,7 @@ class API(object):
     def panel(self, id):
         params = {
             'evaluate': 3, 
+            'profile': userdata.get('profile'),
         }
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/carousel/keys/{}'.format(id), params=params).json()[0]
@@ -86,6 +92,7 @@ class API(object):
     def show(self, id):
         params = {
             'evaluate': 3, 
+            'profile': userdata.get('profile'),
             'showCategory': id,
         }
 
@@ -95,6 +102,7 @@ class API(object):
         params = {
             'evaluate': 3, 
             'event': id,
+            'profile': userdata.get('profile'),
         }
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/event', params=params).json()[0]['contents'][0]['data']['asset']
@@ -103,6 +111,7 @@ class API(object):
         params = {
             'evaluate': 3, 
             'sport': sport, 
+            'profile': userdata.get('profile'),
         }
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/sport', params=params).json()

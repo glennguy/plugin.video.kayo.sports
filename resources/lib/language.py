@@ -14,7 +14,7 @@ class Language(BaseLanguage):
     LIVE             = 30011
     FROM_START       = 30012
     SELECT_PROFILE   = 30013
-
+    SHOW_HERO        = 30014
     SET_REMINDER     = 30015
     REMOVE_REMINDER  = 30016
     REMINDER_SET     = 30017

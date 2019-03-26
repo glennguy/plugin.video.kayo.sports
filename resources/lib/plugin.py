@@ -26,6 +26,7 @@ def home():
 
         folder.add_items(_landing('home'))
 
+        folder.add_item(label=_.SELECT_PROFILE, path=plugin.url_for(select_profile))
         folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout))
 
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS))
@@ -45,6 +46,7 @@ def login():
         return
 
     api.login(username=username, password=password)
+
     gui.refresh()
 
 @plugin.route()
@@ -129,6 +131,10 @@ def playlist(output=''):
     with open(output, 'w') as f:
         f.write(playlist)
 
+@plugin.route()
+def select_profile():
+    _select_profile()
+    gui.refresh()
 
 @plugin.route()
 @plugin.login_required()
@@ -185,6 +191,16 @@ def service():
             _alerts.append(id)
 
     userdata.set('alerts', _alerts)
+
+def _select_profile():
+    profiles = api.profiles()
+    profiles.append({'id': None, 'name': _.NO_PROFILE})
+
+    index = gui.select(_.SELECT_PROFILE, options=[p['name'] for p in profiles])
+    if index < 0:
+        return
+
+    userdata.set('profile', profiles[index]['id'])
 
 def _get_stream(asset):
     streams = [asset['recommendedStream']]
