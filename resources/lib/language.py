@@ -25,9 +25,6 @@ class Language(BaseLanguage):
     CLOSE            = 30022
     EVENT_STARTED    = 30023
     LIVE_PLAY_TYPE   = 30024
-    GENERAL          = 30025
-    PLAYBACK         = 30026
-    UTILITY          = 30027
-    HLS_REQUIRED     = 30028
+    HLS_REQUIRED     = 30025
 
 _ = Language()
