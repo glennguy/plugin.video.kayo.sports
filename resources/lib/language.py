@@ -26,5 +26,7 @@ class Language(BaseLanguage):
     EVENT_STARTED    = 30023
     LIVE_PLAY_TYPE   = 30024
     HLS_REQUIRED     = 30025
+    CHOOSE           = 30026
+    PLAY_FROM        = 30027
 
 _ = Language()

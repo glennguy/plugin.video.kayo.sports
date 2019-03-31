@@ -5,7 +5,7 @@ from matthuisman.exceptions import PluginError
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE, IMG_URL
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL
 
 api = API()
 
@@ -137,9 +137,10 @@ def select_profile():
 
 @plugin.route()
 @plugin.login_required()
-def play(id, start_from=0):
+def play(id, start_from=0, play_type=FROM_LIVE):
     asset = api.stream(id)
     start_from = int(start_from)
+    play_type  = int(play_type)
 
     start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
     if start > arrow.now():
@@ -152,6 +153,10 @@ def play(id, start_from=0):
         art = False,
         headers = HEADERS,
     )
+
+    index = settings.getInt('live_play_type', 0)
+    if asset['isLive'] and play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START):
+        start_from = 0
 
     hls = inputstream.HLS()
 
@@ -315,11 +320,7 @@ def _parse_video(asset):
             plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from)
         )))
 
-    index = settings.getInt('live_play_type', 0)
-    if is_live and LIVE_PLAY_TYPE[index] == FROM_LIVE:
-        start_from = 0
-
-    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from)
+    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=settings.getInt('live_play_type', 0))
 
     return item
 

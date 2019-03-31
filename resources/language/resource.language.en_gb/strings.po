@@ -121,6 +121,14 @@ msgid "Inputstream HLS required to watch Streams From Live\n"
 "Check HLS is enabled in settings and Inputstream Adaptive is installed"
 msgstr ""
 
+msgctxt "#30026"
+msgid "Choose"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Play From?"
+msgstr ""
+
 ##COMMON##
 
 msgctxt "#32000"
