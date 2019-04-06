@@ -155,7 +155,7 @@ def play(id, start_from=0, play_type=FROM_LIVE):
     )
 
     index = settings.getInt('live_play_type', 0)
-    if asset['isLive'] and play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START):
+    if asset['isLive'] and play_type == FROM_LIVE or (play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START)):
         start_from = 0
 
     hls = inputstream.HLS()
