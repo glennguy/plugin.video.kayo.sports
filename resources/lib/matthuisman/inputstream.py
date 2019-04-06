@@ -163,7 +163,7 @@ def _download(url, dst_path):
     if resp.status_code != 200:
         raise InputStreamError(_(_.ERROR_DOWNLOADING_FILE, filename=url.split('/')[-1]))
 
-    total_length = float(resp.headers.get('content-length'))
+    total_length = float(resp.headers.get('content-length', 1))
 
     with gui.progress(_(_.IA_DOWNLOADING_FILE, url=url.split('/')[-1]), heading=_.IA_WIDEVINE_DRM) as progress:
         if os.path.exists(dst_path):
