@@ -15,7 +15,7 @@ def before_dispatch():
     plugin.logged_in = api.logged_in
 
 @plugin.route('')
-def home():
+def home(**kwargs):
     folder = plugin.Folder(cacheToDisc=False)
 
     if not api.logged_in:
@@ -34,7 +34,7 @@ def home():
     return folder
 
 @plugin.route()
-def login():
+def login(**kwargs):
     username = gui.input(_.ASK_USERNAME, default=userdata.get('username', '')).strip()
     if not username:
         return
@@ -49,7 +49,7 @@ def login():
     gui.refresh()
 
 @plugin.route()
-def logout():
+def logout(**kwargs):
     if not gui.yes_no(_.LOGOUT_YES_NO):
         return
 
@@ -57,27 +57,27 @@ def logout():
     gui.refresh()
 
 @plugin.route()
-def shows():
+def shows(**kwargs):
     folder = plugin.Folder(title=_.SHOWS)
     folder.add_items(_landing('shows'))
     return folder 
 
 @plugin.route()
-def sports():
+def sports(**kwargs):
     folder = plugin.Folder(title=_.SPORTS)
    # folder.add_items(_sport('default'))
     folder.add_items(_landing('sports'))
     return folder
 
 # @plugin.route()
-# def sport(sport, name):
+# def sport(sport, name, **kwargs):
 #     folder = plugin.Folder(title=name)
 #     folder.add_items(_sport(sport))
 #     folder.add_items(_landing('sport', sport=sport))
 #     return folder
 
 @plugin.route()
-def show(id, title):
+def show(id, title, **kwargs):
     data = api.show(id)
 
     folder = plugin.Folder(title=title)
@@ -88,14 +88,14 @@ def show(id, title):
     return folder
 
 @plugin.route()
-def panel(id):
+def panel(id, **kwargs):
     data = api.panel(id)
     folder = plugin.Folder(title=data['title'])
     folder.add_items(_parse_contents(data.get('contents', [])))
     return folder
 
 @plugin.route()
-def alert(asset, title, image):
+def alert(asset, title, image, **kwargs):
     alerts = userdata.get('alerts', [])
 
     if asset not in alerts:
@@ -109,7 +109,7 @@ def alert(asset, title, image):
     gui.refresh()
 
 @plugin.route()  
-def playlist(output=''):
+def playlist(output='', **kwargs):
     playlist = '#EXTM3U x-tvg-url=""\n\n'
 
     count = 1
@@ -131,13 +131,13 @@ def playlist(output=''):
         f.write(playlist)
 
 @plugin.route()
-def select_profile():
+def select_profile(**kwargs):
     _select_profile()
     gui.refresh()
 
 @plugin.route()
 @plugin.login_required()
-def play(id, start_from=0, play_type=FROM_LIVE):
+def play(id, start_from=0, play_type=FROM_LIVE, **kwargs):
     asset = api.stream(id)
     start_from = int(start_from)
     play_type  = int(play_type)

@@ -1,7 +1,7 @@
 from urlparse import parse_qsl
 from urllib import urlencode
 
-from .constants import ROUTE_TAG, ADDON_ID, ROUTE_LIVE_TAG, ROUTE_LIVE_SUFFIX, ROUTE_RELOAD_TAG
+from .constants import ROUTE_TAG, ADDON_ID, ROUTE_LIVE_TAG, ROUTE_LIVE_SUFFIX, ROUTE_URL_TAG
 from .log import log
 from .language import _
 from . import signals
@@ -26,13 +26,12 @@ def route(url):
 def parse_url(url):
     if url.startswith('?'):
         params   = dict(parse_qsl(url.lstrip('?')))
-        params.pop(ROUTE_LIVE_TAG, None)
-        params.pop(ROUTE_RELOAD_TAG, None)
-
         _url     = params.pop(ROUTE_TAG, '')
     else:
         params = {}
         _url = url
+
+    params[ROUTE_URL_TAG] = url
 
     function = _routes.get(_url)
 

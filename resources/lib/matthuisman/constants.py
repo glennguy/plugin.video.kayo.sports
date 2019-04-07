@@ -50,7 +50,7 @@ ROUTE_SERVICE          = '_service'
 ROUTE_SERVICE_INTERVAL = (60*5)
 ROUTE_LIVE_TAG         = '_l'
 ROUTE_LIVE_SUFFIX      = '.pvr'
-ROUTE_RELOAD_TAG       = 'reload'
+ROUTE_URL_TAG          = '_url'
 #################
 
 #### INPUTSTREAM ADAPTIVE #####
