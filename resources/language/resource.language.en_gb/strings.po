@@ -290,3 +290,8 @@ msgstr ""
 msgctxt "#32037"
 msgid "Verify SSL Certs"
 msgstr ""
+
+msgctxt "#32038"
+msgid "Existing Widevine DRM found.\n"
+"Would you like to override it?"
+msgstr ""

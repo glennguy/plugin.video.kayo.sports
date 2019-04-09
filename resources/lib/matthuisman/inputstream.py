@@ -124,7 +124,7 @@ def install_widevine(reinstall=False):
     if not os.path.isdir(decryptpath):
         os.makedirs(decryptpath)
 
-    if not _download(url, wv_path):
+    if (not os.path.exists(wv_path) or gui.yes_no(_.IA_OVERRIDE)) and not _download(url, wv_path):
         return False
 
     ia_addon.setSetting(IA_VERSION_KEY, ver_slug)
@@ -159,13 +159,14 @@ def _get_system_arch():
 def _download(url, dst_path):
     from .session import Session
 
-    resp = Session().get(url, stream=True)
-    if resp.status_code != 200:
-        raise InputStreamError(_(_.ERROR_DOWNLOADING_FILE, filename=url.split('/')[-1]))
-
-    total_length = float(resp.headers.get('content-length', 1))
-
     with gui.progress(_(_.IA_DOWNLOADING_FILE, url=url.split('/')[-1]), heading=_.IA_WIDEVINE_DRM) as progress:
+        
+        resp = Session().get(url, stream=True)
+        if resp.status_code != 200:
+            raise InputStreamError(_(_.ERROR_DOWNLOADING_FILE, filename=url.split('/')[-1]))
+
+        total_length = float(resp.headers.get('content-length', 1))
+
         if os.path.exists(dst_path):
             os.remove(dst_path)
 
