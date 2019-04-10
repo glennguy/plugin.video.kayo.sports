@@ -95,15 +95,15 @@ def panel(id, **kwargs):
     return folder
 
 @plugin.route()
-def alert(asset, title, image, **kwargs):
+def alert(asset, title, **kwargs):
     alerts = userdata.get('alerts', [])
 
     if asset not in alerts:
         alerts.append(asset)
-        gui.notification(_.REMINDER_SET, heading=title, icon=image)
+        gui.notification(title, heading=_.REMINDER_SET)
     else:
         alerts.remove(asset)
-        gui.notification(_.REMINDER_REMOVED, heading=title, icon=image)
+        gui.notification(title, heading=_.REMINDER_REMOVED)
 
     userdata.set('alerts', alerts)
     gui.refresh()
@@ -181,23 +181,34 @@ def service():
     if not alerts:
         return
 
-    now = arrow.now()
-
+    now     = arrow.now()
+    notify  = []
     _alerts = []
+    
     for id in alerts:
         asset = api.event(id)
         start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
 
-        if asset.get('isStreaming', False):
-            userdata.set('alerts', _alerts)
-            if gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=(SERVICE_TIME-30)*1000):
-                with signals.throwable():
-                    play(id).play()
-
-        elif start > now or (now - start).seconds < SERVICE_TIME:
+        #If we are streaming and started less than 10 minutes ago
+        if asset.get('isStreaming', False) and (now - start).total_seconds() <= 60*10:
+            notify.append(asset)
+        elif start > now:
             _alerts.append(id)
 
     userdata.set('alerts', _alerts)
+
+    for asset in notify:
+        if gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=1000*60*2):
+            with signals.throwable():
+                
+                start_from = 1
+                start = arrow.get(asset['transmissionTime'])
+                if start < now and 'preCheckTime' in asset:
+                    precheck = arrow.get(asset['preCheckTime'])
+                    if precheck < start:
+                        start_from = (start - precheck).seconds
+
+                play(id=asset['id'], start_from=start_from, play_type=settings.getInt('live_play_type', 0)).play()
 
 def _select_profile():
     profiles = api.profiles()
@@ -302,7 +313,7 @@ def _parse_video(asset):
     if now < start:
         is_live = True
         item.label = _(_.STARTING_SOON, title=asset['title'], humanize=start.humanize())
-        toggle_alert = plugin.url_for(alert, asset=asset['id'], title=asset['title'], image=item.art['thumb'])
+        toggle_alert = plugin.url_for(alert, asset=asset['id'], title=asset['title'])
 
         if asset['id'] not in userdata.get('alerts', []):
             item.info['playcount'] = 0

@@ -101,7 +101,7 @@ msgid "From Live"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Watch Live"
+msgid "Watch"
 msgstr ""
 
 msgctxt "#30022"
