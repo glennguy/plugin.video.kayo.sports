@@ -198,17 +198,19 @@ def service():
     userdata.set('alerts', _alerts)
 
     for asset in notify:
-        if gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=1000*60*2):
-            with signals.throwable():
-                
-                start_from = 1
-                start = arrow.get(asset['transmissionTime'])
-                if start < now and 'preCheckTime' in asset:
-                    precheck = arrow.get(asset['preCheckTime'])
-                    if precheck < start:
-                        start_from = (start - precheck).seconds
+        if not gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=1000*60*2):
+            continue
 
-                play(id=asset['id'], start_from=start_from, play_type=settings.getInt('live_play_type', 0)).play()
+        with signals.throwable():
+            start_from = 1
+            start      = arrow.get(asset['transmissionTime'])
+            
+            if start < now and 'preCheckTime' in asset:
+                precheck = arrow.get(asset['preCheckTime'])
+                if precheck < start:
+                    start_from = (start - precheck).seconds
+
+            play(id=asset['id'], start_from=start_from, play_type=settings.getInt('live_play_type', 0)).play()
 
 def _select_profile():
     profiles = api.profiles()
