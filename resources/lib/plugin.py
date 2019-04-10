@@ -189,8 +189,11 @@ def service():
         start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
 
         if asset.get('isStreaming', False):
-            if gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE):
-                play(id).play()
+            userdata.set('alerts', _alerts)
+            if gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=(SERVICE_TIME-30)*1000):
+                with signals.throwable():
+                    play(id).play()
+
         elif start > now or (now - start).seconds < SERVICE_TIME:
             _alerts.append(id)
 

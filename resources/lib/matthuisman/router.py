@@ -1,11 +1,11 @@
 from urlparse import parse_qsl
 from urllib import urlencode
 
+from . import signals
 from .constants import ROUTE_TAG, ADDON_ID, ROUTE_LIVE_TAG, ROUTE_LIVE_SUFFIX, ROUTE_URL_TAG
 from .log import log
 from .language import _
-from . import signals
-from .exceptions import Error, RouterError
+from .exceptions import RouterError
 
 _routes = {}
 
@@ -70,15 +70,9 @@ def build_url(url, is_live=False, addon_id=ADDON_ID, **kwargs):
 
 # router.dispatch('?_=_settings')
 def dispatch(url):
-    try:
+    with signals.throwable():
         signals.emit(signals.BEFORE_DISPATCH)
         function, params = parse_url(url)
         function(**params)
-    except Error as e:
-        #expected errors
-        signals.emit(signals.ON_ERROR, e)
-    except Exception as e:
-        #unexpected errors
-        signals.emit(signals.ON_EXCEPTION, e)
-    finally:
-        signals.emit(signals.AFTER_DISPATCH)
+
+    signals.emit(signals.AFTER_DISPATCH)

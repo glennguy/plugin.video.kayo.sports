@@ -8,7 +8,5 @@ def run(interval=ROUTE_SERVICE_INTERVAL):
     cmd = 'XBMC.RunPlugin({0})'.format(url)
 
     monitor = xbmc.Monitor()
-    while not monitor.abortRequested():
+    while not monitor.waitForAbort(interval):
         xbmc.executebuiltin(cmd)
-        if monitor.waitForAbort(interval):
-            break
