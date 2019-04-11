@@ -5,7 +5,7 @@ from matthuisman.exceptions import PluginError
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPE, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL
 
 api = API()
 
@@ -135,43 +135,6 @@ def select_profile(**kwargs):
     _select_profile()
     gui.refresh()
 
-@signals.on(signals.ON_SERVICE)
-def service():
-    alerts = userdata.get('alerts', [])
-    if not alerts:
-        return
-
-    now     = arrow.now()
-    notify  = []
-    _alerts = []
-    
-    for id in alerts:
-        asset = api.event(id)
-        start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
-
-        #If we are streaming and started less than 10 minutes ago
-        if asset.get('isStreaming', False) and (now - start).total_seconds() <= 60*10:
-            notify.append(asset)
-        elif start > now:
-            _alerts.append(id)
-
-    userdata.set('alerts', _alerts)
-
-    for asset in notify:
-        if not gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE, autoclose=1000*60*2):
-            continue
-
-        with signals.throwable():
-            start_from = 1
-            start      = arrow.get(asset['transmissionTime'])
-            
-            if start < now and 'preCheckTime' in asset:
-                precheck = arrow.get(asset['preCheckTime'])
-                if precheck < start:
-                    start_from = (start - precheck).seconds
-
-            play(id=asset['id'], start_from=start_from, play_type=settings.getInt('live_play_type', 0)).play()
-
 def _select_profile():
     profiles = api.profiles()
     profiles.append({'id': None, 'name': _.NO_PROFILE})
@@ -241,6 +204,26 @@ def _parse_contents(rows):
 
     return items
 
+def _parse_show(asset):
+    return plugin.Item(
+        label = asset['title'],
+        art  = {
+            'thumb': _get_image(asset, 'carousel-item'),
+            'fanart': _get_image(asset, 'hero-default'),
+        },
+        info = {
+            'plot': asset.get('description-short'),
+            'mediatype': 'tvshow',
+        },
+        path = plugin.url_for(show, id=asset['id'], title=asset['title']),
+    )
+
+def _get_image(asset, type='carousel-item', width=2048):
+    if 'image-pack' not in asset:
+        return None
+
+    return IMG_URL.format(asset['image-pack'], type, width)
+
 def _parse_video(asset):
     alerts = userdata.get('alerts', [])
     
@@ -296,7 +279,7 @@ def _parse_video(asset):
             plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=FROM_START)
         )))
 
-    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=settings.getInt('live_play_type', 0))
+    item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=settings.getEnum('live_play_type', LIVE_PLAY_TYPES, default=FROM_CHOOSE))
 
     return item
 
@@ -319,7 +302,6 @@ def play(id, start_from=0, play_type=FROM_LIVE, **kwargs):
         headers = HEADERS,
     )
 
-    index = settings.getInt('live_play_type', 0)
     if asset['isLive'] and play_type == FROM_LIVE or (play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START)):
         start_from = 0
 
@@ -340,22 +322,39 @@ def play(id, start_from=0, play_type=FROM_LIVE, **kwargs):
 
     return item
 
-def _parse_show(asset):
-    return plugin.Item(
-        label = asset['title'],
-        art  = {
-            'thumb': _get_image(asset, 'carousel-item'),
-            'fanart': _get_image(asset, 'hero-default'),
-        },
-        info = {
-            'plot': asset.get('description-short'),
-            'mediatype': 'tvshow',
-        },
-        path = plugin.url_for(show, id=asset['id'], title=asset['title']),
-    )
+@signals.on(signals.ON_SERVICE)
+def service():
+    alerts = userdata.get('alerts', [])
+    if not alerts:
+        return
 
-def _get_image(asset, type='carousel-item', width=2048):
-    if 'image-pack' not in asset:
-        return None
+    now     = arrow.now()
+    notify  = []
+    _alerts = []
+    
+    for id in alerts:
+        asset = api.event(id)
+        start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
 
-    return IMG_URL.format(asset['image-pack'], type, width)
+        #If we are streaming and started less than 10 minutes ago
+        if asset.get('isStreaming', False) and (now - start).total_seconds() <= 60*10:
+            notify.append(asset)
+        elif start > now:
+            _alerts.append(id)
+
+    userdata.set('alerts', _alerts)
+
+    for asset in notify:
+        if not gui.yes_no(_(_.EVENT_STARTED, event=asset['title']), yeslabel=_.WATCH, nolabel=_.CLOSE):
+            continue
+
+        with signals.throwable():
+            start_from = 1
+            start      = arrow.get(asset['transmissionTime'])
+            
+            if start < now and 'preCheckTime' in asset:
+                precheck = arrow.get(asset['preCheckTime'])
+                if precheck < start:
+                    start_from = (start - precheck).seconds
+
+            play(id=asset['id'], start_from=start_from, play_type=settings.getEnum('live_play_type', LIVE_PLAY_TYPES, default=FROM_CHOOSE))

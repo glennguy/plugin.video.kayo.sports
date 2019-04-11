@@ -74,3 +74,6 @@ LOG_FORMAT = u'%(name)s - %(message)s'
 SESSION_TIMEOUT  = (5, 10)
 SESSION_ATTEMPTS = 2
 #################
+
+#### GUI ####
+GUI_DEFAULT_AUTOCLOSE = 120000 #2mins

@@ -2,6 +2,7 @@ import time
 import xbmc
 import random
 
+from . import settings
 from .router import url_for
 from .constants import ROUTE_SERVICE, ROUTE_SERVICE_INTERVAL
 
@@ -12,10 +13,12 @@ def run(interval=ROUTE_SERVICE_INTERVAL):
 
     monitor = xbmc.Monitor()
 
-    #Random start-up wait
-    monitor.waitForAbort(random.randint(5, 30))
+    delay = settings.getInt('service_delay', 0) or random.randint(10, 60)
+    monitor.waitForAbort(delay)
 
-    while not monitor.waitForAbort(10):
+    while not monitor.abortRequested():
         if time.time() - last_run >= interval:
             xbmc.executebuiltin(cmd)
             last_run = time.time()
+            
+        monitor.waitForAbort(random.randint(5, 20))

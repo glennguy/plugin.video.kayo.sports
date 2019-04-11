@@ -295,3 +295,7 @@ msgctxt "#32038"
 msgid "Existing Widevine DRM found.\n"
 "Would you like to override it?"
 msgstr ""
+
+msgctxt "#32039"
+msgid "Service Start Delay (0 = Random 10s-60s)"
+msgstr ""
