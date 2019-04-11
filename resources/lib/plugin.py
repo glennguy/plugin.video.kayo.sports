@@ -135,46 +135,6 @@ def select_profile(**kwargs):
     _select_profile()
     gui.refresh()
 
-@plugin.route()
-@plugin.login_required()
-def play(id, start_from=0, play_type=FROM_LIVE, **kwargs):
-    asset = api.stream(id)
-    start_from = int(start_from)
-    play_type  = int(play_type)
-
-    start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
-    if start > arrow.now():
-        raise PluginError(_(_.GAME_NOT_STARTED, start=start.humanize()))
-
-    stream = _get_stream(asset)
-
-    item = plugin.Item(
-        path = stream['manifest']['uri'],
-        art = False,
-        headers = HEADERS,
-    )
-
-    index = settings.getInt('live_play_type', 0)
-    if asset['isLive'] and play_type == FROM_LIVE or (play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START)):
-        start_from = 0
-
-    hls = inputstream.HLS()
-
-    if stream['mediaFormat'] == 'dash':
-        item.inputstream = inputstream.MPD()
-    elif stream['mediaFormat'] == 'hls-ts':
-        #If live stream FROM_LIVE and no HLS
-        if asset['isLive'] and not start_from and not hls.check():
-            raise PluginError(_.HLS_REQUIRED)
-        else:
-            item.inputstream = hls
-
-    if start_from:
-        item.properties['ResumeTime'] = start_from
-        item.properties['TotalTime']  = start_from
-
-    return item
-
 @signals.on(signals.ON_SERVICE)
 def service():
     alerts = userdata.get('alerts', [])
@@ -329,14 +289,54 @@ def _parse_video(asset):
         item.label = _(_.LIVE, title=asset['title'])
 
         item.context.append((_.FROM_LIVE, "XBMC.PlayMedia({})".format(
-            plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=0)
+            plugin.url_for(play, id=asset['id'], is_live=is_live, play_type=FROM_LIVE)
         )))
 
         item.context.append((_.FROM_START, "XBMC.PlayMedia({})".format(
-            plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from)
+            plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=FROM_START)
         )))
 
     item.path = plugin.url_for(play, id=asset['id'], is_live=is_live, start_from=start_from, play_type=settings.getInt('live_play_type', 0))
+
+    return item
+
+@plugin.route()
+@plugin.login_required()
+def play(id, start_from=0, play_type=FROM_LIVE, **kwargs):
+    asset = api.stream(id)
+    start_from = int(start_from)
+    play_type  = int(play_type)
+
+    start = arrow.get(asset.get('preCheckTime', asset['transmissionTime']))
+    if start > arrow.now():
+        raise PluginError(_(_.GAME_NOT_STARTED, start=start.humanize()))
+
+    stream = _get_stream(asset)
+
+    item = plugin.Item(
+        path = stream['manifest']['uri'],
+        art = False,
+        headers = HEADERS,
+    )
+
+    index = settings.getInt('live_play_type', 0)
+    if asset['isLive'] and play_type == FROM_LIVE or (play_type == FROM_CHOOSE and gui.yes_no(_.PLAY_FROM, yeslabel=_.FROM_LIVE, nolabel=_.FROM_START)):
+        start_from = 0
+
+    hls = inputstream.HLS()
+
+    if stream['mediaFormat'] == 'dash':
+        item.inputstream = inputstream.MPD()
+    elif stream['mediaFormat'] == 'hls-ts':
+        #If live stream FROM_LIVE and no HLS
+        if asset['isLive'] and not start_from and not hls.check():
+            raise PluginError(_.HLS_REQUIRED)
+        else:
+            item.inputstream = hls
+
+    if start_from:
+        item.properties['ResumeTime'] = start_from
+        item.properties['TotalTime']  = start_from
 
     return item
 
