@@ -67,24 +67,31 @@ class API(object):
         self._refresh_token()
         return self._session.get('https://profileapi.kayosports.com.au/user/profile').json()
 
+    def sport_menu(self, sport):
+        return self._session.get('https://resources.kayosports.com.au/production/sport-menu/lists/{}.json'.format(sport)).json()
+
     #landing has heros and panels
-    def landing(self, name):
+    def landing(self, name, **kwargs):
         params = {
-            'evaluate': 3, 
+            'evaluate': 99, 
             'profile': userdata.get('profile'),
             'resourcesEnv': 'production',
             'chromecastEnv': 'production',
             'statsEnv': 'production',
         }
 
+        params.update(**kwargs)
+
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/{}'.format(name), params=params).json()
 
     #panel has shows and episodes
-    def panel(self, id):
+    def panel(self, id, **kwargs):
         params = {
             'evaluate': 3, 
             'profile': userdata.get('profile'),
         }
+
+        params.update(**kwargs)
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/carousel/keys/{}'.format(id), params=params).json()[0]
 
@@ -106,18 +113,6 @@ class API(object):
         }
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/event', params=params).json()[0]['contents'][0]['data']['asset']
-
-    def sport(self, sport=None):
-        params = {
-            'evaluate': 3, 
-            'sport': sport, 
-            'profile': userdata.get('profile'),
-        }
-
-        return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/sport', params=params).json()
-
-    def sport_menu(self, sport):
-        return self._session.get('https://resources.kayosports.com.au/production/sport-menu/lists/{}.json'.format(sport)).json()
 
     def stream(self, asset):
         self._refresh_token()

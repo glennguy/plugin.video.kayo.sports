@@ -60,6 +60,9 @@ def build_url(url, is_live=False, addon_id=ADDON_ID, **kwargs):
 
     params = []
     for k in sorted(kwargs):
+        if kwargs[k] == None:
+            continue
+
         try: params.append((k, unicode(kwargs[k]).encode('utf-8')))
         except: params.append((k, kwargs[k]))
 

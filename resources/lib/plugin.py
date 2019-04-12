@@ -65,7 +65,7 @@ def shows(**kwargs):
 @plugin.route()
 def sports(**kwargs):
     folder = plugin.Folder(title=_.SPORTS)
-   # folder.add_items(_sport('default'))
+    folder.add_items(_sport('default'))
     folder.add_items(_landing('sports'))
     return folder
 
@@ -88,8 +88,8 @@ def show(id, title, **kwargs):
     return folder
 
 @plugin.route()
-def panel(id, **kwargs):
-    data = api.panel(id)
+def panel(id, sport=None, **kwargs):
+    data = api.panel(id, sport=sport)
     folder = plugin.Folder(title=data['title'])
     folder.add_items(_parse_contents(data.get('contents', [])))
     return folder
@@ -121,7 +121,7 @@ def playlist(output='', **kwargs):
             continue
 
         playlist += '#EXTINF:-1 tvg-name="{count:03d}" tvg-id="{id}" tvg-logo="{logo}",{name}\n{path}\n\n'.format(
-            count=count, id=asset['id'], logo=_get_image(asset, 'carousel-item'), name=asset['title'], path=plugin.url_for(play, id=asset['id']))
+            count=count, id=asset['id'], logo=_get_image(asset, 'video', 'thumb'), name=asset['title'], path=plugin.url_for(play, id=asset['id']))
         count += 1
 
     playlist = playlist.strip()
@@ -164,32 +164,43 @@ def _sport(sport):
     #https://vccapi.kayosports.com.au/content/types/landing/names/sport?sport=tennis&evaluate=3&profile=d3bf57f6ce9bbadf05488e7fd82972e899e857be
 
     for row in api.sport_menu(sport):
+        name  = row['name']
+        sport = row['url'].split('sport!')[1]
+
         item = plugin.Item(
-            label = row['name'],
-            path = plugin.url_for(sport_list, sport=row['sport'], name=row['name']),
+            label = name,
+            path = plugin.url_for(sport_list, sport=sport, name=name),
             art = {'thumb': 'https://resources.kayosports.com.au/production/sport-logos/1x1/{}.png?imwidth=320'.format(row['sport'])},
         )
+
         items.append(item)
 
     return items
 
-def _landing(name):
+@plugin.route()
+def sport_list(sport, name, **kwargs):
+    folder = plugin.Folder(title=name)
+    folder.add_items(_landing('sport', sport=sport))
+    return folder
+
+def _landing(name, sport=None):
     items = []
 
-    for row in api.landing(name):
-        if row['panelType'] != 'hero-carousel':
-            items.append(_parse_panel(row))
-
-        elif row['panelType'] == 'hero-carousel' and 'contents' in row and settings.getBool('show_hero_contents'):
+    for row in api.landing(name, sport=sport):
+        if row['panelType'] == 'hero-carousel' and row.get('contents') and settings.getBool('show_hero_contents', True):
             items.extend(_parse_contents(row['contents']))
 
-    return items
+        elif row['panelType'] != 'hero-carousel' and row.get('contents'):
+            items.append(plugin.Item(
+                label = row['title'],
+                path  = plugin.url_for(panel, id=row['id'], sport=sport),
+                art   = {
+                    'thumb': _get_image(row['contents'][0]['data']['asset'], 'panel', 'thumb'),
+                    'fanart': _get_image(row['contents'][0]['data']['asset'], 'panel', 'fanart'),
+                },
+            ))
 
-def _parse_panel(row):
-    return plugin.Item(
-        label = row['title'],
-        path  = plugin.url_for(panel, id=row['id']),
-    )
+    return items
 
 def _parse_contents(rows):
     items = []
@@ -199,6 +210,7 @@ def _parse_contents(rows):
 
         if row['contentType'] == 'video':
             items.append(_parse_video(asset))
+
         elif row['contentType'] == 'section':
             items.append(_parse_show(asset))
 
@@ -208,21 +220,24 @@ def _parse_show(asset):
     return plugin.Item(
         label = asset['title'],
         art  = {
-            'thumb': _get_image(asset, 'carousel-item'),
-            'fanart': _get_image(asset, 'hero-default'),
+            'thumb': _get_image(asset, 'show', 'thumb'),
+            'fanart': _get_image(asset, 'show', 'fanart'),
         },
         info = {
             'plot': asset.get('description-short'),
-            'mediatype': 'tvshow',
         },
         path = plugin.url_for(show, id=asset['id'], title=asset['title']),
     )
 
-def _get_image(asset, type='carousel-item', width=2048):
+def _get_image(asset, media_type, img_type='thumb', width=None):
     if 'image-pack' not in asset:
         return None
 
-    return IMG_URL.format(asset['image-pack'], type, width)
+    if img_type == 'thumb':
+        return IMG_URL.format(asset['image-pack'], 'carousel-item', width or 415)
+
+    elif img_type == 'fanart':
+        return IMG_URL.format(asset['image-pack'], 'hero-default', width or 1920)
 
 def _parse_video(asset):
     alerts = userdata.get('alerts', [])
@@ -241,8 +256,8 @@ def _parse_video(asset):
     item = plugin.Item(
         label = asset['title'],
         art  = {
-            'thumb': _get_image(asset, 'carousel-item'),
-            'fanart': _get_image(asset, 'hero-default'),
+            'thumb': _get_image(asset, 'video', 'thumb'),
+            'fanart': _get_image(asset, 'video', 'fanart'),
         },
         info = {
             'plot': asset.get('description'),
