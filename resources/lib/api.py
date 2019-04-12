@@ -67,8 +67,8 @@ class API(object):
         self._refresh_token()
         return self._session.get('https://profileapi.kayosports.com.au/user/profile').json()
 
-    def sport_menu(self, sport):
-        return self._session.get('https://resources.kayosports.com.au/production/sport-menu/lists/{}.json'.format(sport)).json()
+    def sport_menu(self):
+        return self._session.get('https://resources.kayosports.com.au/production/sport-menu/lists/default.json').json()
 
     #landing has heros and panels
     def landing(self, name, **kwargs):

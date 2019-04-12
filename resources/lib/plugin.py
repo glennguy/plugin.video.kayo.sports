@@ -5,7 +5,7 @@ from matthuisman.exceptions import PluginError
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL, SPORT_LOGO
 
 api = API()
 
@@ -65,16 +65,27 @@ def shows(**kwargs):
 @plugin.route()
 def sports(**kwargs):
     folder = plugin.Folder(title=_.SPORTS)
-    folder.add_items(_sport('default'))
+
+    for row in api.sport_menu():
+        slug = row['url'].split('sport!')[1]
+
+        folder.add_item(
+            label = row['name'],
+            path  = plugin.url_for(sport, slug=slug, title=row['name']),
+            art   = {
+                'thumb': SPORT_LOGO.format(row['sport']),
+            },
+        )
+
     folder.add_items(_landing('sports'))
+
     return folder
 
-# @plugin.route()
-# def sport(sport, name, **kwargs):
-#     folder = plugin.Folder(title=name)
-#     folder.add_items(_sport(sport))
-#     folder.add_items(_landing('sport', sport=sport))
-#     return folder
+@plugin.route()
+def sport(slug, title, **kwargs):
+    folder = plugin.Folder(title=title)
+    folder.add_items(_landing('sport', sport=slug))
+    return folder
 
 @plugin.route()
 def show(id, title, **kwargs):
@@ -157,31 +168,6 @@ def _get_stream(asset):
         raise PluginError(_.NO_STREAM)
 
     return streams[0]
-
-def _sport(sport):
-    items = []
-
-    #https://vccapi.kayosports.com.au/content/types/landing/names/sport?sport=tennis&evaluate=3&profile=d3bf57f6ce9bbadf05488e7fd82972e899e857be
-
-    for row in api.sport_menu(sport):
-        name  = row['name']
-        sport = row['url'].split('sport!')[1]
-
-        item = plugin.Item(
-            label = name,
-            path = plugin.url_for(sport_list, sport=sport, name=name),
-            art = {'thumb': 'https://resources.kayosports.com.au/production/sport-logos/1x1/{}.png?imwidth=320'.format(row['sport'])},
-        )
-
-        items.append(item)
-
-    return items
-
-@plugin.route()
-def sport_list(sport, name, **kwargs):
-    folder = plugin.Folder(title=name)
-    folder.add_items(_landing('sport', sport=sport))
-    return folder
 
 def _landing(name, sport=None):
     items = []
