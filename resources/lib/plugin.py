@@ -19,14 +19,11 @@ def home(**kwargs):
     folder = plugin.Folder(cacheToDisc=False)
 
     if not api.logged_in:
-        folder.add_item(label=_(_.LOGIN, _bold=True), path=plugin.url_for(login))
+        folder.add_item(label=_(_.LOGIN, _bold=True),  path=plugin.url_for(login))
     else:
-        folder.add_item(label=_(_.SHOWS, _bold=True), path=plugin.url_for(shows))
+        folder.add_item(label=_(_.SHOWS, _bold=True),  path=plugin.url_for(shows))
         folder.add_item(label=_(_.SPORTS, _bold=True), path=plugin.url_for(sports))
-
         folder.add_items(_landing('home'))
-
-        folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout))
 
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS))
 
@@ -49,6 +46,7 @@ def login(**kwargs):
     gui.refresh()
 
 @plugin.route()
+@plugin.login_required()
 def logout(**kwargs):
     if not gui.yes_no(_.LOGOUT_YES_NO):
         return
@@ -142,6 +140,7 @@ def playlist(output='', **kwargs):
         f.write(playlist)
 
 @plugin.route()
+@plugin.login_required()
 def select_profile(**kwargs):
     _select_profile()
     gui.refresh()

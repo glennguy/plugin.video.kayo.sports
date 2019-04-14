@@ -3,7 +3,9 @@
     <category label="32034">
         <setting label="30024" id="live_play_type" type="enum" default="0" lvalues="30026|30020|30012"/>
         <setting label="30014" id="show_hero_contents" type="bool" default="true"/>
-        <setting label="30013" type="action" action="RunPlugin(plugin://$ID/?_=select_profile)" />
+        <setting label="30013" type="action" action="RunPlugin(plugin://$ID/?_=select_profile)" enable="eq(2,true)"/>
+        <setting label="32025" type="action" action="RunPlugin(plugin://$ID/?_=logout)" enable="eq(1,true)"/>
+        <setting id="_logged_in" type="bool" visible="false" default="false"/>
     </category>
     
     <category label="32035">

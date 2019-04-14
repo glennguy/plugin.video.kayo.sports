@@ -1,6 +1,6 @@
 from time import time
 
-from matthuisman import userdata
+from matthuisman import userdata, settings
 from matthuisman.session import Session
 from matthuisman.exceptions import Error
 
@@ -16,6 +16,8 @@ class API(object):
 
         self._session = Session(HEADERS)
         self._set_authentication()
+        
+        settings.setBool('_logged_in', self.logged_in)
 
     def _set_authentication(self):
         access_token = userdata.get('access_token')
