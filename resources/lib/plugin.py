@@ -26,7 +26,6 @@ def home(**kwargs):
 
         folder.add_items(_landing('home'))
 
-        folder.add_item(label=_.SELECT_PROFILE, path=plugin.url_for(select_profile))
         folder.add_item(label=_.LOGOUT, path=plugin.url_for(logout))
 
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(plugin.ROUTE_SETTINGS))
@@ -46,6 +45,7 @@ def login(**kwargs):
         return
 
     api.login(username=username, password=password)
+    _select_profile()
     gui.refresh()
 
 @plugin.route()
