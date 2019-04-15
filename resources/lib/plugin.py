@@ -87,7 +87,7 @@ def sport(slug, title, **kwargs):
 
 @plugin.route()
 def show(id, title, **kwargs):
-    data = api.show(id)
+    data = api.show(id, profile=userdata.get('profile'))
 
     folder = plugin.Folder(title=title)
     for row in data:
@@ -98,7 +98,7 @@ def show(id, title, **kwargs):
 
 @plugin.route()
 def panel(id, sport=None, **kwargs):
-    data = api.panel(id, sport=sport)
+    data = api.panel(id, sport=sport, profile=userdata.get('profile'))
     folder = plugin.Folder(title=data['title'])
     folder.add_items(_parse_contents(data.get('contents', [])))
     return folder
@@ -171,7 +171,7 @@ def _get_stream(asset):
 def _landing(name, sport=None):
     items = []
 
-    for row in api.landing(name, sport=sport):
+    for row in api.landing(name, sport=sport, profile=userdata.get('profile')):
         if row['panelType'] == 'hero-carousel' and row.get('contents') and settings.getBool('show_hero_contents', True):
             items.extend(_parse_contents(row['contents']))
 

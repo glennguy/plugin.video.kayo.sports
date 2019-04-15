@@ -76,7 +76,6 @@ class API(object):
     def landing(self, name, **kwargs):
         params = {
             'evaluate': 99, 
-            'profile': userdata.get('profile'),
             'resourcesEnv': 'production',
             'chromecastEnv': 'production',
             'statsEnv': 'production',
@@ -90,7 +89,6 @@ class API(object):
     def panel(self, id, **kwargs):
         params = {
             'evaluate': 3, 
-            'profile': userdata.get('profile'),
         }
 
         params.update(**kwargs)
@@ -98,21 +96,23 @@ class API(object):
         return self._session.get('https://vccapi.kayosports.com.au/content/types/carousel/keys/{}'.format(id), params=params).json()[0]
 
     #show has episodes and panels
-    def show(self, id):
+    def show(self, id, **kwargs):
         params = {
-            'evaluate': 3, 
-            'profile': userdata.get('profile'),
+            'evaluate': 3,
             'showCategory': id,
         }
 
+        params.update(**kwargs)
+
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/show', params=params).json()
 
-    def event(self, id):
+    def event(self, id, **kwargs):
         params = {
-            'evaluate': 3, 
+            'evaluate': 3,
             'event': id,
-            'profile': userdata.get('profile'),
         }
+
+        params.update(**kwargs)
 
         return self._session.get('https://vccapi.kayosports.com.au/content/types/landing/names/event', params=params).json()[0]['contents'][0]['data']['asset']
 
