@@ -6,6 +6,7 @@ from functools import wraps
 import xbmcgui
 
 from .log import log
+from .util import hash_6
 from .constants import ADDON_ID, CACHE_EXPIRY, ROUTE_CLEAR_CACHE
 from . import signals, gui, router, settings
 
@@ -74,7 +75,7 @@ def _build_key(func_name, *args, **kwargs):
         if is_primitive(kwargs[k]):
             key += to_str(k) + to_str(kwargs[k])
 
-    return key
+    return hash_6(key)
 
 def cached(*args, **kwargs):
     def decorator(f, expires=CACHE_EXPIRY, key=None):

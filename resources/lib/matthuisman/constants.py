@@ -58,7 +58,7 @@ IA_ADDON_ID     = 'inputstream.adaptive'
 IA_VERSION_KEY  = '_version'
 IA_HLS_MIN_VER  = 2
 IA_MPD_MIN_VER  = 2
-IA_MODULES_URL  = 'https://k.mjh.nz/.decryptmodules/modules.json'
+IA_MODULES_URL  = 'https://k.mjh.nz/.decryptmodules/modules.v2.json'
 ###################
 
 #### MISC #####
@@ -73,6 +73,7 @@ LOG_FORMAT = u'%(name)s - %(message)s'
 #### SESSION ####
 SESSION_TIMEOUT  = (5, 10)
 SESSION_ATTEMPTS = 2
+SESSION_CHUNKSIZE = 4096
 #################
 
 #### GUI ####

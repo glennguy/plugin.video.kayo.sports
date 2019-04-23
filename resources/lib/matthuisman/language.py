@@ -70,6 +70,7 @@ class BaseLanguage(object):
     VERIFY_SSL                  = 32037
     IA_OVERRIDE                 = 32038
     SERVICE_DELAY               = 32039
+    MD5_MISMATCH                = 32040
 
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

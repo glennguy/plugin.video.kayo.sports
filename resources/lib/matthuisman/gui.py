@@ -143,6 +143,9 @@ class Item(object):
             li.setLabel(self.label)
             if not self.info.get('plot'):
                 self.info['plot'] = self.label
+                
+            if not self.info.get('title'):
+                self.info['title'] = self.label
 
         if self.path:
             li.setPath(self.path)
