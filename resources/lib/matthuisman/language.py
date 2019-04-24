@@ -1,7 +1,7 @@
 from .log import log
 from .constants import ADDON
 
-def format_string(string, _bold=False, _label=False, _color=None, _strip=True, **kwargs):
+def format_string(string, _bold=False, _label=False, _color=None, _strip=False, **kwargs):
     if kwargs:
         string = string.format(**kwargs)
 

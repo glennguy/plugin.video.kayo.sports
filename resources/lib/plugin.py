@@ -2,10 +2,11 @@ import arrow
 
 from matthuisman import plugin, gui, settings, userdata, signals, inputstream
 from matthuisman.exceptions import PluginError
+from matthuisman.session import Session
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL, SPORT_LOGO
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL, SPORT_LOGO, EPG_URL, CHANNELS_PANEL
 
 api = API()
 
@@ -118,26 +119,27 @@ def alert(asset, title, **kwargs):
     gui.refresh()
 
 @plugin.route()  
-def playlist(output='', **kwargs):
+def playlist(output, **kwargs):
     playlist = '#EXTM3U x-tvg-url=""\n\n'
 
-    count = 1
-    data = api.panel('yJbvNNbmxlD6')
+    data = api.panel(CHANNELS_PANEL)
+
     for row in data.get('contents', []):
         asset = row['data']['asset']
 
         if row['contentType'] != 'video':
             continue
 
-        playlist += '#EXTINF:-1 tvg-name="{count:03d}" tvg-id="{id}" tvg-logo="{logo}",{name}\n{path}\n\n'.format(
-            count=count, id=asset['id'], logo=_get_image(asset, 'video', 'thumb'), name=asset['title'], path=plugin.url_for(play, id=asset['id']))
-        count += 1
+        playlist += '#EXTINF:-1 tvg-id="{id}" tvg-logo="{logo}",{name}\n{path}\n\n'.format(
+            id=asset['id'], logo=_get_image(asset, 'video', 'thumb'), name=asset['title'], path=plugin.url_for(play, id=asset['id']))
 
     playlist = playlist.strip()
-
-    output = output or 'playlist.m3u8'
     with open(output, 'w') as f:
         f.write(playlist)
+
+@plugin.route()  
+def epg(output, **kwargs):
+    Session().chunked_dl(EPG_URL, output)
 
 @plugin.route()
 @plugin.login_required()

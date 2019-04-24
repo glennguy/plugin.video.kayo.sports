@@ -6,6 +6,9 @@ SPORT_LOGO = 'https://resources.kayosports.com.au/production/sport-logos/1x1/{}.
 IMG_URL    = 'https://vmndims.kayosports.com.au/api/v2/img/{}?location={}&imwidth={}'
 CLIENTID   = 'qjmv9ZvaMDS9jGvHOxVfImLgQ3G5NrT2'
 
+EPG_URL        = 'http://i.mjh.nz/au/Kayo/epg.xml'
+CHANNELS_PANEL = 'yJbvNNbmxlD6'
+
 SERVICE_TIME = 270
 
 FROM_CHOOSE = 0
