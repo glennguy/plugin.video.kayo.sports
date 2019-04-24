@@ -6,7 +6,7 @@ from matthuisman.session import Session
 
 from .api import API
 from .language import _
-from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL, SPORT_LOGO, EPG_URL, CHANNELS_PANEL
+from .constants import HEADERS, SERVICE_TIME, LIVE_PLAY_TYPES, FROM_LIVE, FROM_START, FROM_CHOOSE, IMG_URL, SPORT_LOGO, CHANNELS_PANEL
 
 api = API()
 
@@ -137,9 +137,9 @@ def playlist(output, **kwargs):
     with open(output, 'w') as f:
         f.write(playlist)
 
-@plugin.route()  
-def epg(output, **kwargs):
-    Session().chunked_dl(EPG_URL, output)
+# @plugin.route()  
+# def epg(output, **kwargs):
+#     Session().chunked_dl(EPG_URL, output) different ids = won't work
 
 @plugin.route()
 @plugin.login_required()
