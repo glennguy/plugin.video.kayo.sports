@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.kayo.sports" name="Kayo Sports" provider-name="MattHuisman.nz" version="0.2.0">
+<addon id="plugin.video.kayo.sports" name="Kayo Sports" provider-name="MattHuisman.nz" version="0.2.1">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.requests"/>
@@ -16,6 +16,6 @@
     <license></license>
     <language></language>
     <website>https://www.matthuisman.nz/2019/03/kayo-sports-kodi-add-on.html</website>
-    <news>Add support for IPTV Merge</news>
+    <news>Add support for IPTV Merge (playlist only at moment)</news>
   </extension>
 </addon>
