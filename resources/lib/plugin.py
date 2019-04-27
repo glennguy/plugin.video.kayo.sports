@@ -161,9 +161,10 @@ def _get_stream(asset):
     streams = [asset['recommendedStream']]
     streams.extend(asset['alternativeStreams'])
 
+    cdn = api.cdn_selection()
     playable = ['hls-ts', 'dash']
     streams  = [s for s in streams if s['mediaFormat'] in playable]
-    streams  = sorted(streams, key=lambda k: (k['mediaFormat'] == 'hls-ts', k['provider'] == 'AKAMAI'), reverse=True)
+    streams  = sorted(streams, key=lambda k: (k['mediaFormat'] == 'hls-ts', k['provider'] == cdn), reverse=True)
 
     if not streams:
         raise PluginError(_.NO_STREAM)
