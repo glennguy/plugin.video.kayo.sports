@@ -73,10 +73,7 @@ class API(object):
         return self._session.get('https://resources.kayosports.com.au/production/sport-menu/lists/default.json').json()
 
     def cdn_selection(self):
-        cdn = self._session.get('https://cdnselectionserviceapi.kayosports.com.au/android/usecdn/mobile/live').json().get('useCDN')
-        if not cdn:
-            return 'AKAMAI'
-        return cdn
+        return self._session.get('https://cdnselectionserviceapi.kayosports.com.au/android/usecdn/mobile/live').json().get('useCDN', 'AKAMAI')
 
     #landing has heros and panels
     def landing(self, name, **kwargs):
